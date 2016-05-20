@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 
 namespace ZInternetRouter.Server.Core
@@ -56,6 +55,7 @@ namespace ZInternetRouter.Server.Core
                             break;
 
                         case "getroute":
+                            getCmds = false; //This must be the last command.
                             string targetRouteId = inputStream.ReadLine();
                             var targetCandidates = _proxyRoutingConnectorService.ConnectedClients.Where(cc => cc.MemberId == targetRouteId).ToList();
                             if (targetCandidates.Count > 0)
@@ -64,8 +64,11 @@ namespace ZInternetRouter.Server.Core
                                 outputStream.Flush();
                                 var routingController = new SocketRoutingService();
                                 var routeTargetClient = targetCandidates[0];
-                                var remoteClientEndpoint = (IPEndPoint)routeTargetClient.RequestProcessor._baseSocket.Client.RemoteEndPoint;
-                                routingController.CreateSocketRouteProxy(_baseSocket.Client, routeTargetClient.RequestProcessor._baseSocket.Client);
+                                //var remoteClientEndpoint = (IPEndPoint)routeTargetClient.RequestProcessor._baseSocket.Client.RemoteEndPoint;
+                                var socket1 = _baseSocket.Client;
+                                var socket2 = routeTargetClient.RequestProcessor._baseSocket.Client;
+                                routingController.CreateSocketRouteProxy(socket1, socket2);
+                                routingController.CreateSocketRouteProxy(socket2, socket1);
                             }
                             else
                             {

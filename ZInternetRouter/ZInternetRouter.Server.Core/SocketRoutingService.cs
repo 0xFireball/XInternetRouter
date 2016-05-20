@@ -14,8 +14,6 @@ namespace ZInternetRouter.Server.Core
         {
             var forwardingInformation1 = new ForwardingInfo(socket1, socket2);
             socket1.BeginReceive(forwardingInformation1.Buffer, 0, forwardingInformation1.Buffer.Length, SocketFlags.None, OnDataReceive, forwardingInformation1);
-            var forwardingInformation2 = new ForwardingInfo(socket2, socket1);
-            socket2.BeginReceive(forwardingInformation2.Buffer, 0, forwardingInformation2.Buffer.Length, SocketFlags.None, OnDataReceive, forwardingInformation2);
         }
 
         private static void OnDataReceive(IAsyncResult result)

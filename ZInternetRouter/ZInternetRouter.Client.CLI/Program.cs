@@ -17,13 +17,7 @@ namespace ZInternetRouter.Client.CLI
             string memberId = inputStream.ReadLine();
             Console.WriteLine("Connected to server!");
             Console.WriteLine($"My ID: {memberId}");
-            string partnerId = ConsoleExtensions.ReadWrite("Enter a partner ID: ");
-            outputStream.WriteLine("getroute");
-            outputStream.Flush();
-            outputStream.WriteLine(partnerId);
-            outputStream.Flush();
-            string msg = inputStream.ReadLine();
-            Console.WriteLine(msg);
+
             Task.Factory.StartNew(() =>
             {
                 while (true)
