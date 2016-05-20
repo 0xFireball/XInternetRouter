@@ -41,8 +41,10 @@ namespace ZInternetRouter.Server.Core
                 var inputStream = new StreamReader(_baseSocket.GetStream());
                 var outputStream = new StreamWriter(new BufferedStream(_baseSocket.GetStream()));
                 _proxyRoutingConnectorService.ConnectedClients.Add(HostClient);
+                outputStream.WriteLine(HostClient.MemberId);
+                outputStream.Flush();
                 //Impatiently wait for data
-                _baseSocket.ReceiveTimeout = 10000;
+                //_baseSocket.ReceiveTimeout = 10000;
                 bool getCmds = true;
                 while (getCmds)
                 {
@@ -89,7 +91,7 @@ namespace ZInternetRouter.Server.Core
                     //Keep connection alive
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 if (_baseSocket.Connected)
                     _baseSocket.Close();

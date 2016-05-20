@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{4E4B8261-BD52-405C-BD40-0F3D2A932286}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZInternetRouter.Server.Core", "ZInternetRouter.Server.Core\ZInternetRouter.Server.Core.csproj", "{D0F82001-0246-4680-BFC6-E47F538DBEA9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZInternetRouter.Server.CLIHost", "ZInternetRouter.Server.CLIHost\ZInternetRouter.Server.CLIHost.csproj", "{BE7ECCD2-D05C-4614-8668-7628005ED03A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{49693D7E-132D-4080-8724-08EEF1AA6C2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZInternetRouter.Client.CLI", "ZInternetRouter.Client.CLI\ZInternetRouter.Client.CLI.csproj", "{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +27,10 @@ Global
 		{BE7ECCD2-D05C-4614-8668-7628005ED03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE7ECCD2-D05C-4614-8668-7628005ED03A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE7ECCD2-D05C-4614-8668-7628005ED03A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,5 +38,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D0F82001-0246-4680-BFC6-E47F538DBEA9} = {4E4B8261-BD52-405C-BD40-0F3D2A932286}
 		{BE7ECCD2-D05C-4614-8668-7628005ED03A} = {4E4B8261-BD52-405C-BD40-0F3D2A932286}
+		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0} = {49693D7E-132D-4080-8724-08EEF1AA6C2D}
 	EndGlobalSection
 EndGlobal

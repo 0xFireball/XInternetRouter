@@ -1,6 +1,6 @@
 ﻿namespace ZInternetRouter.Server.Core
 {
-    internal class ZInternetRouterRunner
+    public class ZInternetRouterRunner
     {
         public static void RunServer(string bindAddress, int bindPort)
         {
