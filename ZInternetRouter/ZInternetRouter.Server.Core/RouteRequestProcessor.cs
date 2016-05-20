@@ -60,11 +60,11 @@ namespace ZInternetRouter.Server.Core
                             if (targetCandidates.Count > 0)
                             {
                                 outputStream.WriteLine("SUCCESS");
-                                var routingController = new InternetRoutingProxy();
+                                outputStream.Flush();
+                                var routingController = new SocketRoutingService();
                                 var routeTargetClient = targetCandidates[0];
                                 var remoteClientEndpoint = (IPEndPoint)routeTargetClient.RequestProcessor._baseSocket.Client.RemoteEndPoint;
-                                routingController.StartProxy(new IPEndPoint(IPAddress.Parse("0.0.0.0"), 21337), remoteClientEndpoint);
-                                outputStream.Flush();
+                                routingController.CreateSocketRouteProxy(_baseSocket.Client, routeTargetClient.RequestProcessor._baseSocket.Client);
                             }
                             else
                             {

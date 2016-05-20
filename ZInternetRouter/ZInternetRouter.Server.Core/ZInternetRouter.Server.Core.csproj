@@ -46,6 +46,7 @@
     <Compile Include="ProxyRoutingConnectorService.cs" />
     <Compile Include="RouteRequestProcessor.cs" />
     <Compile Include="RoutingConnectorClient.cs" />
+    <Compile Include="SocketRoutingService.cs" />
     <Compile Include="ZInternetRouterRunner.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
