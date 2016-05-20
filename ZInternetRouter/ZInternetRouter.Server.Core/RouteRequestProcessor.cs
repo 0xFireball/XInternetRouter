@@ -40,7 +40,6 @@ namespace ZInternetRouter.Server.Core
             {
                 var inputStream = new StreamReader(_baseSocket.GetStream());
                 var outputStream = new StreamWriter(new BufferedStream(_baseSocket.GetStream()));
-                _proxyRoutingConnectorService.ConnectedClients.Add(HostClient);
                 outputStream.WriteLine(HostClient.MemberId);
                 outputStream.Flush();
                 //Impatiently wait for data
@@ -96,7 +95,6 @@ namespace ZInternetRouter.Server.Core
                 if (_baseSocket.Connected)
                     _baseSocket.Close();
             }
-            _proxyRoutingConnectorService.ConnectedClients.Remove(HostClient);
         }
 
         #endregion Public Methods
