@@ -50,7 +50,7 @@ namespace ZInternetRouter.Server.Core
                     forwardingInformation.SourceSocket.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, 0, OnDataReceive, forwardingInformation);
                 }
             }
-            catch
+            catch (SocketException)
             {
                 forwardingInformation.DestinationSocket.Close();
                 forwardingInformation.SourceSocket.Close();

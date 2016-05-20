@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 
 namespace ZInternetRouter.Server.Core
 {
@@ -7,11 +8,33 @@ namespace ZInternetRouter.Server.Core
         /// <summary>
         /// Creates a route between two sockets, acting as a proxy.
         /// </summary>
-        /// <param name="localSocket"></param>
-        /// <param name="remoteSocket"></param>
-        public void CreateSocketRouteProxy(Socket localSocket, Socket remoteSocket)
+        /// <param name="socket1"></param>
+        /// <param name="socket2"></param>
+        public void CreateSocketRouteProxy(Socket socket1, Socket socket2)
         {
+            var forwardingInformation1 = new ForwardingInfo(socket1, socket2);
+            socket1.BeginReceive(forwardingInformation1.Buffer, 0, forwardingInformation1.Buffer.Length, SocketFlags.None, OnDataReceive, forwardingInformation1);
+            var forwardingInformation2 = new ForwardingInfo(socket2, socket1);
+            socket2.BeginReceive(forwardingInformation2.Buffer, 0, forwardingInformation2.Buffer.Length, SocketFlags.None, OnDataReceive, forwardingInformation2);
+        }
 
+        private static void OnDataReceive(IAsyncResult result)
+        {
+            var forwardingInformation = (ForwardingInfo)result.AsyncState;
+            try
+            {
+                var bytesRead = forwardingInformation.SourceSocket.EndReceive(result);
+                if (bytesRead > 0)
+                {
+                    forwardingInformation.DestinationSocket.Send(forwardingInformation.Buffer, bytesRead, SocketFlags.None);
+                    forwardingInformation.SourceSocket.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, 0, OnDataReceive, forwardingInformation);
+                }
+            }
+            catch (SocketException)
+            {
+                forwardingInformation.DestinationSocket.Close();
+                forwardingInformation.SourceSocket.Close();
+            }
         }
     }
 }
