@@ -31,6 +31,11 @@ namespace ZInternetRouter.Server.Core
             }
         }
 
+        public void CreateSocketRoute(Socket localSocket, Socket remoteSocket)
+        {
+            
+        }
+
         private void Connect(EndPoint remoteEndpoint, Socket destination)
         {
             var forwardingInformation = new ForwardingInfo(_baseSocket, destination);
