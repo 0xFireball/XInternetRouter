@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 
@@ -22,7 +23,7 @@ namespace ZInternetRouter.Server.Core
         }
 
         /// <summary>
-        /// Starts the proxy between localEndPoint and remoteEndPoint
+        /// Starts the proxy between existingLocalConnection and remoteEndPoint
         /// </summary>
         /// <param name="localEndPoint">The local endpoint of the tunnel</param>
         /// <param name="remoteEndPoint">The remote endpoint of the tunnel</param>
@@ -48,12 +49,28 @@ namespace ZInternetRouter.Server.Core
 
             while (true)
             {
-                var source = _baseSocket.Accept();
-                var destination = new InternetRoutingProxy(existingRemoteConnection);
-                var forwardingInformation = new ForwardingInfo(source, destination._baseSocket);
-                destination.ConnectWithExisting(source);
-                source.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, 0, OnDataReceive, forwardingInformation);
+                try
+                {
+                    var source = _baseSocket.Accept();
+                    var destination = new InternetRoutingProxy(existingRemoteConnection);
+                    var forwardingInformation = new ForwardingInfo(source, destination._baseSocket);
+                    destination.ConnectWithExisting(source);
+                    source.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, 0, OnDataReceive, forwardingInformation);
+                }
+                catch (Exception)
+                {
+                    //Something bad happened. Too bad.
+                }
             }
+        }
+
+        public void StartProxy(Socket existingLocalConnection, IPEndPoint remoteEndPoint)
+        {
+            var source = existingLocalConnection;
+            var destination = new InternetRoutingProxy();
+            var forwardingInformation = new ForwardingInfo(source, destination._baseSocket);
+            destination.Connect(remoteEndPoint, source);
+            source.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, 0, OnDataReceive, forwardingInformation);
         }
 
         private void Connect(EndPoint remoteEndpoint, Socket destination)
@@ -81,7 +98,7 @@ namespace ZInternetRouter.Server.Core
                     forwardingInformation.SourceSocket.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, 0, OnDataReceive, forwardingInformation);
                 }
             }
-            catch (SocketException)
+            catch (Exception)
             {
                 forwardingInformation.DestinationSocket.Close();
                 forwardingInformation.SourceSocket.Close();

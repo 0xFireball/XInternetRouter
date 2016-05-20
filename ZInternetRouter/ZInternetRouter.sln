@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{49693D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZInternetRouter.Client.CLI", "ZInternetRouter.Client.CLI\ZInternetRouter.Client.CLI.csproj", "{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZInternetRouter.ClientForwarder", "ZInternetRouter.ClientForwarder\ZInternetRouter.ClientForwarder.csproj", "{D4FD63D2-F0CE-4346-83FE-5844BDF9FC44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4FD63D2-F0CE-4346-83FE-5844BDF9FC44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4FD63D2-F0CE-4346-83FE-5844BDF9FC44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4FD63D2-F0CE-4346-83FE-5844BDF9FC44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4FD63D2-F0CE-4346-83FE-5844BDF9FC44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,5 +45,6 @@ Global
 		{D0F82001-0246-4680-BFC6-E47F538DBEA9} = {4E4B8261-BD52-405C-BD40-0F3D2A932286}
 		{BE7ECCD2-D05C-4614-8668-7628005ED03A} = {4E4B8261-BD52-405C-BD40-0F3D2A932286}
 		{B9CE40D2-9B61-48D7-A31E-A83099EB12C0} = {49693D7E-132D-4080-8724-08EEF1AA6C2D}
+		{D4FD63D2-F0CE-4346-83FE-5844BDF9FC44} = {49693D7E-132D-4080-8724-08EEF1AA6C2D}
 	EndGlobalSection
 EndGlobal

@@ -25,6 +25,7 @@ namespace ZInternetRouter.Server.Core
 
         #endregion Public Constructors
 
+        public bool ReceivingCommands { get; set; } = true;
         #region Public Methods
 
         public void KillConnection()
@@ -43,8 +44,7 @@ namespace ZInternetRouter.Server.Core
                 outputStream.Flush();
                 //Impatiently wait for data
                 //_baseSocket.ReceiveTimeout = 10000;
-                bool getCmds = true;
-                while (getCmds)
+                while (ReceivingCommands)
                 {
                     string command = inputStream.ReadLine();
                     switch (command)
@@ -55,7 +55,7 @@ namespace ZInternetRouter.Server.Core
                             break;
 
                         case "getroute":
-                            getCmds = false; //This must be the last command.
+                            ReceivingCommands = false; //This must be the last command.
                             string targetRouteId = inputStream.ReadLine();
                             var targetCandidates = _proxyRoutingConnectorService.ConnectedClients.Where(cc => cc.MemberId == targetRouteId).ToList();
                             if (targetCandidates.Count > 0)
@@ -64,6 +64,7 @@ namespace ZInternetRouter.Server.Core
                                 outputStream.Flush();
                                 var routingController = new SocketRoutingService();
                                 var routeTargetClient = targetCandidates[0];
+                                routeTargetClient.RequestProcessor.ReceivingCommands = false;
                                 //var remoteClientEndpoint = (IPEndPoint)routeTargetClient.RequestProcessor._baseSocket.Client.RemoteEndPoint;
                                 var socket1 = _baseSocket.Client;
                                 var socket2 = routeTargetClient.RequestProcessor._baseSocket.Client;
@@ -82,7 +83,7 @@ namespace ZInternetRouter.Server.Core
                             break;
 
                         case "endcmds":
-                            getCmds = false;
+                            ReceivingCommands = false;
                             break;
                     }
                 }

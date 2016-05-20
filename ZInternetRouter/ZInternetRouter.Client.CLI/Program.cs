@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using ZInternetRouter.Server.Core;
 
 namespace ZInternetRouter.Client.CLI
 {
@@ -19,27 +20,29 @@ namespace ZInternetRouter.Client.CLI
             string memberId = inputStream.ReadLine();
             Console.WriteLine("Connected to server!");
             Console.WriteLine($"My ID: {memberId}");
-            int proxyPort = 24999;
-            TcpListener proxyListener = new TcpListener(IPAddress.Any, proxyPort);
-            List<TcpClient> proxyClients = new List<TcpClient>();
-            Task.Factory.StartNew(() => //Proxy thread
+
+            //If has proxy specified, only proxy
+            if (args.Length >= 3)
             {
-                proxyListener.Start();
-                while (true)
+                int proxyPort = int.Parse(args[2]);
+                Console.WriteLine($"Proxy running on port {proxyPort}");
+                Task.Factory.StartNew(() => //Proxy thread
                 {
-                    var s = proxyListener.AcceptTcpClient();
-                    proxyClients.Add(s);
-                }
-            });
-            /*
-            Task.Factory.StartNew(() => //Thread to display output
+                    var routingProxy = new InternetRoutingProxy();
+                    routingProxy.StartProxy(new IPEndPoint(IPAddress.Any, proxyPort), zirClient.Client);
+                });
+            }
+            else //If not proxying, echo
             {
-                while (true)
+                Console.WriteLine("Echoing received data to console");
+                Task.Factory.StartNew(() => //Thread to display output
                 {
-                    Console.WriteLine(inputStream.ReadLine());
-                }
-            });
-            */
+                    while (true)
+                    {
+                        Console.WriteLine(inputStream.ReadLine());
+                    }
+                });
+            }
             while (true)
             {
                 var dts = Console.ReadLine();
