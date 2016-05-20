@@ -9,7 +9,17 @@ namespace ZInternetRouter.Server.Core
     /// </summary>
     public class InternetRoutingProxy
     {
-        private readonly Socket _baseSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); //Proxy through a TCP socket
+        private readonly Socket _baseSocket;
+
+        public InternetRoutingProxy()
+        {
+            _baseSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); //Proxy through a TCP socket
+        }
+
+        private InternetRoutingProxy(Socket existingConnectionToRemoteSocket)
+        {
+            _baseSocket = existingConnectionToRemoteSocket;
+        }
 
         /// <summary>
         /// Starts the proxy between localEndPoint and remoteEndPoint
@@ -31,10 +41,31 @@ namespace ZInternetRouter.Server.Core
             }
         }
 
+        public void StartProxy(IPEndPoint localEndPoint, Socket existingRemoteConnection)
+        {
+            _baseSocket.Bind(localEndPoint);
+            _baseSocket.Listen(10);
+
+            while (true)
+            {
+                var source = _baseSocket.Accept();
+                var destination = new InternetRoutingProxy(existingRemoteConnection);
+                var forwardingInformation = new ForwardingInfo(source, destination._baseSocket);
+                destination.ConnectWithExisting(source);
+                source.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, 0, OnDataReceive, forwardingInformation);
+            }
+        }
+
         private void Connect(EndPoint remoteEndpoint, Socket destination)
         {
             var forwardingInformation = new ForwardingInfo(_baseSocket, destination);
             _baseSocket.Connect(remoteEndpoint);
+            _baseSocket.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, SocketFlags.None, OnDataReceive, forwardingInformation);
+        }
+
+        private void ConnectWithExisting(Socket destination)
+        {
+            var forwardingInformation = new ForwardingInfo(_baseSocket, destination);
             _baseSocket.BeginReceive(forwardingInformation.Buffer, 0, forwardingInformation.Buffer.Length, SocketFlags.None, OnDataReceive, forwardingInformation);
         }
 
