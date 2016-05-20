@@ -33,8 +33,9 @@ namespace ZInternetRouter.Client.CLI
             });
             while (true)
             {
-                outputStream.WriteLine(Console.ReadLine());
-                outputStream.Flush();
+                var dts = Console.ReadLine();
+                outputStream.WriteLine(dts);
+                outputStream.FlushAsync();
             }
         }
 
