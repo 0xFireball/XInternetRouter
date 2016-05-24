@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using ZInternetRouter.Server.Core;
@@ -17,7 +18,7 @@ namespace ZInternetRouter.ClientForwarder
             }
             else
             {
-                var wait = false;
+                bool wait = false;
                 if (args.Length >= 5)
                 {
                     if (args[4] == "-wait")
@@ -28,44 +29,25 @@ namespace ZInternetRouter.ClientForwarder
                     Console.WriteLine("Waiting for ENTER");
                     Console.ReadLine();
                 }
-
-                //Pause the thread neatly
-                var suspendEvent = new ManualResetEvent(true);
+                var localProxyAddr = args[0];
+                var localProxyPort = int.Parse(args[1]);
+                var proxyClient = new TcpClient(localProxyAddr, localProxyPort);
+                var remoteAddr = args[2];
+                var remotePort = int.Parse(args[3]);
+                var routingProxy = new InternetRoutingProxy();
+                routingProxy.StartProxy(proxyClient.Client, new IPEndPoint(IPAddress.Parse(remoteAddr), remotePort));
+                ManualResetEvent suspendEvent = new ManualResetEvent(true);
                 suspendEvent.Reset();
-
-                //Start proxying loop, this is a service
                 while (true)
                 {
-                    try
-                    {
-                        var localProxyAddr = args[0];
-                        var localProxyPort = int.Parse(args[1]);
-                        var proxyClient = new TcpClient(localProxyAddr, localProxyPort);
-                        //Subscribe to the ZIR proxy running locally
-                        //Try to hold connections to remote as long as possible, and reconnect when necessary
-                        var remoteAddr = args[2];
-                        var remotePort = int.Parse(args[3]);
-                        var remoteConnectionClient = new TcpClient(remoteAddr, remotePort);
-                        var socketRouter = new SocketRoutingService();
-                        socketRouter.CreateSocketRouteProxy(proxyClient.Client, remoteConnectionClient.Client);
-                        //This is async, so pause the rest of the thread
-                        while (true)
-                        {
-                            suspendEvent.WaitOne();
-                        }
-                    }
-                    catch (SocketException)
-                    {
-                        Console.WriteLine("Remote disconnected.");
-                    }
+                    suspendEvent.WaitOne();
                 }
             }
         }
 
         public static void ShowUsage()
         {
-            Console.WriteLine(
-                "Usage:\nClientForwarder <local proxy address> <local proxy port> <remote address> <remote port>");
+            Console.WriteLine("Usage:\nClientForwarder <local proxy address> <local proxy port> <remote address> <remote port>");
         }
     }
 }
