@@ -30,6 +30,15 @@ namespace ZInternetRouter.ClientForwarder
                     Console.ReadLine();
                 }
 
+                var localProxyAddr = args[0];
+                var localProxyPort = int.Parse(args[1]);
+                //Subscribe to the ZIR proxy running locally
+
+
+                //Parse remote endpoint
+                var remoteAddr = args[2];
+                var remotePort = int.Parse(args[3]);
+
                 //Pause the thread neatly
                 var suspendEvent = new ManualResetEvent(true);
                 suspendEvent.Reset();
@@ -39,25 +48,20 @@ namespace ZInternetRouter.ClientForwarder
                 {
                     try
                     {
-                        var localProxyAddr = args[0];
-                        var localProxyPort = int.Parse(args[1]);
-                        var proxyClient = new TcpClient(localProxyAddr, localProxyPort);
-                        //Subscribe to the ZIR proxy running locally
+                        suspendEvent.Reset();
                         //Try to hold connections to remote as long as possible, and reconnect when necessary
-                        var remoteAddr = args[2];
-                        var remotePort = int.Parse(args[3]);
+                        var proxyClient = new TcpClient(localProxyAddr, localProxyPort); //Reconnect to ZIR proxy
                         var remoteConnectionClient = new TcpClient(remoteAddr, remotePort);
+                        Console.WriteLine("Remote connected.");
                         var socketRouter = new SocketRoutingService();
                         //Make a 2-way route
-                        socketRouter.CreateSocketRouteProxy(proxyClient.Client, remoteConnectionClient.Client);
-                        socketRouter.CreateSocketRouteProxy(remoteConnectionClient.Client, proxyClient.Client);
+                        socketRouter.CreateSocketRouteProxy(proxyClient.Client, remoteConnectionClient.Client, suspendEvent);
+                        socketRouter.CreateSocketRouteProxy(remoteConnectionClient.Client, proxyClient.Client, suspendEvent);
                         //This is async, so pause the rest of the thread
-                        while (true)
-                        {
-                            suspendEvent.WaitOne();
-                        }
+                        suspendEvent.WaitOne();
+                        //We have been signaled to reconnect!
                     }
-                    catch (SocketException)
+                    catch (SocketException sEx)
                     {
                         Console.WriteLine("Remote disconnected.");
                     }

@@ -56,7 +56,6 @@ namespace ZInternetRouter.Server.Core
                             break;
 
                         case "getroute":
-                            ReceivingCommands = false; //This must be the last command.
                             var targetRouteId = InputStream.ReadLine();
                             var targetCandidates =
                                 _proxyRoutingConnectorService.ConnectedClients.Where(cc => cc.MemberId == targetRouteId)
@@ -67,6 +66,7 @@ namespace ZInternetRouter.Server.Core
                                 OutputStream.Flush();
                                 var routingController = new SocketRoutingService();
                                 var routeTargetClient = targetCandidates[0];
+                                ReceivingCommands = false; //This must be the last command, because route was successful.
                                 routeTargetClient.RequestProcessor.ReceivingCommands = false;
                                 routeTargetClient.RequestProcessor.OutputStream.WriteLine("ROUTED");
                                 routeTargetClient.RequestProcessor.OutputStream.Flush();    
@@ -75,7 +75,6 @@ namespace ZInternetRouter.Server.Core
                                 var socket2 = routeTargetClient.RequestProcessor._baseSocket.Client;
                                 Console.WriteLine("Creating route between {0} and {1} on request from {0}",
                                     HostClient.MemberId, routeTargetClient.MemberId);
-
                                 routingController.CreateSocketRouteProxy(socket1, socket2);
                                 routingController.CreateSocketRouteProxy(socket2, socket1);
                             }

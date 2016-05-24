@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading;
 
 namespace ZInternetRouter.Server.Core
 {
@@ -20,6 +21,7 @@ namespace ZInternetRouter.Server.Core
         public byte[] Buffer { get; private set; }
         public Socket DestinationSocket { get; private set; }
         public Socket SourceSocket { get; private set; }
+        public ManualResetEvent SocketClosedEvent { get; set; }
 
         #endregion Public Properties
     }
