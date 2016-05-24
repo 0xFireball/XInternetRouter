@@ -7,25 +7,24 @@ namespace ZInternetRouter.Server.Core
 {
     public class RouteRequestProcessor
     {
-        #region Private Fields
-
-        private TcpClient _baseSocket;
-        private ProxyRoutingConnectorService _proxyRoutingConnectorService;
-        private bool _stayConnected;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         public RouteRequestProcessor(TcpClient baseSocket, ProxyRoutingConnectorService proxyRoutingConnectorService)
         {
-            this._baseSocket = baseSocket;
-            this._proxyRoutingConnectorService = proxyRoutingConnectorService;
+            _baseSocket = baseSocket;
+            _proxyRoutingConnectorService = proxyRoutingConnectorService;
         }
 
         #endregion Public Constructors
 
-        public bool ReceivingCommands { get; set; } = true;
+        #region Private Fields
+
+        private readonly TcpClient _baseSocket;
+        private readonly ProxyRoutingConnectorService _proxyRoutingConnectorService;
+        private bool _stayConnected;
+
+        #endregion Private Fields
+
         #region Public Methods
 
         public void KillConnection()
@@ -36,45 +35,54 @@ namespace ZInternetRouter.Server.Core
 
         public void ProcessConnection()
         {
+            InputStream = new StreamReader(_baseSocket.GetStream());
+            OutputStream = new StreamWriter(new BufferedStream(_baseSocket.GetStream()));
             try
             {
-                var inputStream = new StreamReader(_baseSocket.GetStream());
-                var outputStream = new StreamWriter(new BufferedStream(_baseSocket.GetStream()));
-                outputStream.WriteLine(HostClient.MemberId);
-                outputStream.Flush();
+                OutputStream.WriteLine(HostClient.MemberId);
+                OutputStream.Flush();
                 //Impatiently wait for data
                 //_baseSocket.ReceiveTimeout = 10000;
+                Console.WriteLine($"Client {HostClient.MemberId} connected.");
                 while (ReceivingCommands)
                 {
-                    string command = inputStream.ReadLine();
+                    var command = InputStream.ReadLine();
+                    Console.WriteLine($"Client {HostClient.MemberId} sent command {command}");
                     switch (command)
                     {
                         case "setid":
-                            string id = inputStream.ReadLine();
+                            var id = InputStream.ReadLine();
                             HostClient.MemberId = id;
                             break;
 
                         case "getroute":
                             ReceivingCommands = false; //This must be the last command.
-                            string targetRouteId = inputStream.ReadLine();
-                            var targetCandidates = _proxyRoutingConnectorService.ConnectedClients.Where(cc => cc.MemberId == targetRouteId).ToList();
+                            var targetRouteId = InputStream.ReadLine();
+                            var targetCandidates =
+                                _proxyRoutingConnectorService.ConnectedClients.Where(cc => cc.MemberId == targetRouteId)
+                                    .ToList();
                             if (targetCandidates.Count > 0)
                             {
-                                outputStream.WriteLine("SUCCESS");
-                                outputStream.Flush();
+                                OutputStream.WriteLine("SUCCESS");
+                                OutputStream.Flush();
                                 var routingController = new SocketRoutingService();
                                 var routeTargetClient = targetCandidates[0];
                                 routeTargetClient.RequestProcessor.ReceivingCommands = false;
+                                routeTargetClient.RequestProcessor.OutputStream.WriteLine("ROUTED");
+                                routeTargetClient.RequestProcessor.OutputStream.Flush();    
                                 //var remoteClientEndpoint = (IPEndPoint)routeTargetClient.RequestProcessor._baseSocket.Client.RemoteEndPoint;
                                 var socket1 = _baseSocket.Client;
                                 var socket2 = routeTargetClient.RequestProcessor._baseSocket.Client;
+                                Console.WriteLine("Creating route between {0} and {1} on request from {0}",
+                                    HostClient.MemberId, routeTargetClient.MemberId);
+
                                 routingController.CreateSocketRouteProxy(socket1, socket2);
                                 routingController.CreateSocketRouteProxy(socket2, socket1);
                             }
                             else
                             {
-                                outputStream.WriteLine("FAIL");
-                                outputStream.Flush();
+                                OutputStream.WriteLine("FAIL");
+                                OutputStream.Flush();
                             }
                             break;
 
@@ -93,11 +101,13 @@ namespace ZInternetRouter.Server.Core
                 {
                     //Keep connection alive
                 }
+                Console.WriteLine($"Client {HostClient.MemberId} disconnected cleanly.");
             }
             catch (Exception ex)
             {
                 if (_baseSocket.Connected)
                     _baseSocket.Close();
+                Console.WriteLine($"Client {HostClient.MemberId} disconnected with an exception.");
             }
         }
 
@@ -106,6 +116,9 @@ namespace ZInternetRouter.Server.Core
         #region Public Properties
 
         public RoutingConnectorClient HostClient { get; set; }
+        public StreamReader InputStream { get; set; }
+        public StreamWriter OutputStream { get; set; }
+        public bool ReceivingCommands { get; set; } = true;
 
         #endregion Public Properties
     }

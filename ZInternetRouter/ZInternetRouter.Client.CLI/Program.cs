@@ -20,6 +20,17 @@ namespace ZInternetRouter.Client.CLI
             Console.WriteLine("Connected to server!");
             Console.WriteLine($"My ID: {memberId}");
 
+            //Disconnect when routed
+            Task.Factory.StartNew(() =>
+            {
+                string dt = inputStream.ReadLine();
+                if (dt == "ROUTED")
+                {
+                    outputStream.WriteLine("endcmds");
+                    outputStream.Flush();
+                }
+            });
+
             //Proxy client
             int proxyPort = int.Parse(args[2]);
             Console.WriteLine($"Proxy running on port {proxyPort}");

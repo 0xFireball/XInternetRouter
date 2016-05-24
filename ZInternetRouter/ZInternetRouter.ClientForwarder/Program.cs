@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using ZInternetRouter.Server.Core;
@@ -47,7 +48,9 @@ namespace ZInternetRouter.ClientForwarder
                         var remotePort = int.Parse(args[3]);
                         var remoteConnectionClient = new TcpClient(remoteAddr, remotePort);
                         var socketRouter = new SocketRoutingService();
+                        //Make a 2-way route
                         socketRouter.CreateSocketRouteProxy(proxyClient.Client, remoteConnectionClient.Client);
+                        socketRouter.CreateSocketRouteProxy(remoteConnectionClient.Client, proxyClient.Client);
                         //This is async, so pause the rest of the thread
                         while (true)
                         {

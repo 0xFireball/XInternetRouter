@@ -50,6 +50,8 @@ namespace ZInternetRouter.Server.Core
             {
                 try
                 {
+                    if (!existingRemoteConnection.Connected)
+                        throw new ApplicationException("Connection to the remote has been lost.");
                     var source = _baseSocket.Accept();
                     var destination = new InternetRoutingProxy(existingRemoteConnection);
                     var forwardingInformation = new ForwardingInfo(source, destination._baseSocket);
@@ -99,8 +101,11 @@ namespace ZInternetRouter.Server.Core
             }
             catch (Exception)
             {
-                forwardingInformation.DestinationSocket.Close();
-                forwardingInformation.SourceSocket.Close();
+                //Close dead sockets
+                if (!forwardingInformation.DestinationSocket.Connected)
+                    forwardingInformation.DestinationSocket.Close();
+                if (!forwardingInformation.SourceSocket.Connected)
+                    forwardingInformation.SourceSocket.Close();
             }
         }
     }
