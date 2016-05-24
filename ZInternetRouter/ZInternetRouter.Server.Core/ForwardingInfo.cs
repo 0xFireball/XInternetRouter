@@ -4,14 +4,6 @@ namespace ZInternetRouter.Server.Core
 {
     internal class ForwardingInfo
     {
-        #region Public Properties
-
-        public byte[] Buffer { get; private set; }
-        public Socket DestinationSocket { get; private set; }
-        public Socket SourceSocket { get; private set; }
-
-        #endregion Public Properties
-
         #region Public Methods
 
         public ForwardingInfo(Socket source, Socket destination)
@@ -22,5 +14,13 @@ namespace ZInternetRouter.Server.Core
         }
 
         #endregion Public Methods
+
+        #region Public Properties
+
+        public byte[] Buffer { get; private set; }
+        public Socket DestinationSocket { get; private set; }
+        public Socket SourceSocket { get; private set; }
+
+        #endregion Public Properties
     }
 }
