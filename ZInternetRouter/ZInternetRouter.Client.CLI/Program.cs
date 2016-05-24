@@ -20,34 +20,11 @@ namespace ZInternetRouter.Client.CLI
             Console.WriteLine("Connected to server!");
             Console.WriteLine($"My ID: {memberId}");
 
-            //If has proxy specified, only proxy
-            if (args.Length >= 3)
-            {
-                int proxyPort = int.Parse(args[2]);
-                Console.WriteLine($"Proxy running on port {proxyPort}");
-                Task.Factory.StartNew(() => //Proxy thread
-                {
-                    var routingProxy = new InternetRoutingProxy();
-                    routingProxy.StartProxy(new IPEndPoint(IPAddress.Any, proxyPort), zirClient.Client);
-                });
-            }
-            else //If not proxying, echo
-            {
-                Console.WriteLine("Echoing received data to console");
-                Task.Factory.StartNew(() => //Thread to display output
-                {
-                    while (true)
-                    {
-                        Console.WriteLine(inputStream.ReadLine());
-                    }
-                });
-            }
-            while (true)
-            {
-                var dts = Console.ReadLine();
-                outputStream.WriteLine(dts);
-                outputStream.FlushAsync();
-            }
+            //Proxy client
+            int proxyPort = int.Parse(args[2]);
+            Console.WriteLine($"Proxy running on port {proxyPort}");
+            var routingProxy = new InternetRoutingProxy();
+            routingProxy.StartProxy(new IPEndPoint(IPAddress.Any, proxyPort), zirClient.Client);
         }
 
         #endregion Private Methods
